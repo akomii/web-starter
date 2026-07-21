@@ -17,6 +17,7 @@
     "typecheck": "bun run --filter='*' typecheck",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "init": "bun run scripts/init.ts",
     "prepare": "lefthook install"
   },
