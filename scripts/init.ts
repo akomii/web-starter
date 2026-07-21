@@ -3,8 +3,6 @@ import { $ } from "bun";
 const TOKENS = [
   "{{PROJECT_NAME}}",
   "{{REPO_SLUG}}",
-  "{{REPO_OWNER}}",
-  "{{REPO_NAME}}",
   "{{DESCRIPTION}}",
   "{{AUTHOR}}",
   "{{OWNER}}"
@@ -41,8 +39,6 @@ const owner = prompt("Code owner (GitHub handle or team):", ownerGuess) ?? owner
 const values: Record<Token, string> = {
   "{{PROJECT_NAME}}": name,
   "{{REPO_SLUG}}": slug,
-  "{{REPO_OWNER}}": ownerGuess,
-  "{{REPO_NAME}}": nameGuess,
   "{{DESCRIPTION}}": description,
   "{{AUTHOR}}": author,
   "{{OWNER}}": owner
