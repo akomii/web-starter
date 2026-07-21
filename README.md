@@ -1,4 +1,4 @@
-# **PROJECT_NAME**
+# {{PROJECT_NAME}}
 
 <!-- template:start -->
 
@@ -11,21 +11,21 @@
 > ```
 >
 > `init` reads your `git remote` to guess the slug, prompts for the rest, and
-> rewrites the placeholders (`__PROJECT_NAME__`, `__REPO_SLUG__`,
-> `__DESCRIPTION__`, `__AUTHOR__`, `__OWNER__`) across the repo. After it runs,
+> rewrites the placeholders (`{{PROJECT_NAME}}`, `{{REPO_SLUG}}`,
+> `{{DESCRIPTION}}`, `{{AUTHOR}}`, `{{OWNER}}`) across the repo. After it runs,
 > review the diff, commit, then do the one-time GitHub steps under
 > [Repository settings](#repository-settings).
 
 <!-- template:end -->
 
-[![CI](https://github.com/__REPO_SLUG__/actions/workflows/ci.yml/badge.svg)](https://github.com/__REPO_SLUG__/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/__REPO_SLUG__/actions/workflows/codeql.yml/badge.svg)](https://github.com/__REPO_SLUG__/actions/workflows/codeql.yml)
-[![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/__REPO_SLUG__/gh-pages/coverage.json)](https://github.com/__REPO_SLUG__/actions/workflows/coverage-badge.yml)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/__REPO_SLUG__/badge)](https://securityscorecards.dev/viewer/?uri=github.com/__REPO_SLUG__)
+[![CI](https://github.com/{{REPO_SLUG}}/actions/workflows/ci.yml/badge.svg)](https://github.com/{{REPO_SLUG}}/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/{{REPO_SLUG}}/actions/workflows/codeql.yml/badge.svg)](https://github.com/{{REPO_SLUG}}/actions/workflows/codeql.yml)
+[![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/{{REPO_SLUG}}/gh-pages/coverage.json)](https://github.com/{{REPO_SLUG}}/actions/workflows/coverage-badge.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/{{REPO_SLUG}}/badge)](https://securityscorecards.dev/viewer/?uri=github.com/{{REPO_SLUG}})
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
-[![Release](https://img.shields.io/github/v/release/__REPO_SLUG__)](https://github.com/__REPO_SLUG__/releases)
+[![Release](https://img.shields.io/github/v/release/{{REPO_SLUG}})](https://github.com/{{REPO_SLUG}}/releases)
 
-# **DESCRIPTION**
+# {{DESCRIPTION}}
 
 ## Stack
 
@@ -51,58 +51,32 @@ Commits must follow [Conventional Commits](https://www.conventionalcommits.org)
 
 ## Repository settings
 
-These are one-time GitHub settings the code cannot set for you. Do them after
-`bun run init`.
+One-time GitHub settings the code cannot set for you. Do them after `bun run init`.
 
-- **Branch protection on `main`.** Settings → Branches. Require a pull request
-  and require the `CI` check. Why: keeps unreviewed or broken code off `main`.
-- **Let Actions bypass that protection.** Same screen, add GitHub Actions (or
-  the release bot) to the bypass list. Why: the release workflow pushes a
-  `chore(release)` commit (changelog + version) back to `main`. Without the
-  bypass that push is rejected and the release stops.
-- **Workflow permissions: read and write.** Settings → Actions → General. Why:
-  the release workflow creates the GitHub Release and pushes the changelog
-  commit.
-- **Code scanning.** Free on public repos (CodeQL runs from `codeql.yml`).
-  Private repos need GitHub Advanced Security for the alerts to appear.
-- **Secret scanning + push protection.** Settings → Code security. On by
-  default for public repos. Why: blocks committed credentials.
-- **Coverage badge.** Nothing to do. The `coverage-badge` workflow creates the
-  `gh-pages` branch on the first push to `main`; the badge resolves after that.
-- **Template toggle off.** If this repo was itself created from the template,
-  leave the "Template repository" setting off so it is not re-templated.
+| Setting                           | Where and what to do                                                                      | Why                                                                                                                                  |
+| --------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Branch protection on `main`       | Settings → Branches. Require a pull request and the `CI` check                            | Keeps unreviewed or broken code off `main`                                                                                           |
+| Actions bypass on `main`          | Same screen, add GitHub Actions to the bypass list                                        | The release workflow pushes a `chore(release)` commit back to `main`. Without the bypass that push is rejected and the release stops |
+| Workflow permissions              | Settings → Actions → General → Read and write                                             | The release workflow creates the GitHub Release and pushes the changelog commit                                                      |
+| Code scanning                     | Runs from `codeql.yml`, free on public repos                                              | Private repos need GitHub Advanced Security for the alerts to appear                                                                 |
+| Secret scanning + push protection | Settings → Code security, on by default for public repos                                  | Blocks committed credentials                                                                                                         |
+| Coverage badge                    | Nothing to do, `coverage-badge` creates the `gh-pages` branch on the first push to `main` | The badge resolves after that first run                                                                                              |
+| Template toggle                   | Leave "Template repository" off if this repo was made from the template                   | Prevents re-templating                                                                                                               |
 
-## How the infra works (and why)
+## How the infra works
 
-- **bun monorepo** (`apps/*`, `packages/*`). One lockfile, shared tooling at the
-  root. Why: add a backend (`apps/api`) or shared code (`packages/shared`)
-  later without reworking the setup.
-- **ESLint (flat) + Prettier.** ESLint owns correctness, Prettier owns
-  formatting. Why: no rule conflicts, one formatter of record.
-- **lefthook + commitlint.** pre-commit formats and lints staged files,
-  commit-msg enforces Conventional Commits, pre-push runs typecheck + test +
-  build. Why: catch problems locally and keep history machine-parseable for the
-  changelog.
-- **CI** (`ci.yml` → reusable `verify.yml`). Runs on push and PR to `main`,
-  cancels superseded runs, least-privilege token. Why: fast, safe feedback.
-- **Security scans.** CodeQL (SAST), dependency-review (blocks vulnerable deps
-  in PRs), OpenSSF Scorecard (posture score), secret scanning. All surface in
-  the Security tab. Why: catch code and supply-chain issues early.
-- **Coverage badge.** Vitest emits a JSON summary; `coverage-badge.yml` computes
-  the percentage and publishes a shields endpoint to `gh-pages`. Why: a live
-  badge with no third-party service.
-- **Releases** (`release.yml`, tag-driven). Push `vX.Y.Z` → git-cliff builds the
-  changelog and notes, the version bump + changelog are committed back, a
-  CycloneDX SBOM and SLSA build/SBOM attestations are generated, and the bundle
-  - SBOM are attached to the GitHub Release. Why: reproducible, auditable
-    releases straight from commit history.
-- **Dependabot.** Weekly npm updates (dev deps grouped) and grouped
-  github-actions updates. Why: stay patched; grouping actions avoids partial
-  bumps that break paired steps (e.g. CodeQL).
-- **SHA-pinned actions.** Every action is pinned to a full commit SHA with a
-  version comment. Why: a moved tag cannot swap the code under you. Dependabot
-  updates the SHAs.
-- **Pinned bun** (`.bun-version`). Same runtime locally and in CI.
+| Component                | What it does                                                                                                                                        | Why                                                                                             |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| bun monorepo             | `apps/*` + `packages/*`, one lockfile, shared tooling at the root                                                                                   | Add a backend (`apps/api`) or shared code (`packages/shared`) later without reworking the setup |
+| ESLint (flat) + Prettier | ESLint owns correctness, Prettier owns formatting                                                                                                   | No rule conflicts, one formatter of record                                                      |
+| lefthook + commitlint    | pre-commit formats and lints staged files, commit-msg enforces Conventional Commits, pre-push runs typecheck, test, build                           | Catch problems locally, keep history parseable for the changelog                                |
+| CI                       | `ci.yml` calls the reusable `verify.yml` on push and PR, cancels superseded runs, least-privilege token                                             | Fast, safe feedback                                                                             |
+| Security scans           | CodeQL, dependency-review, OpenSSF Scorecard, secret scanning, all surfaced in the Security tab                                                     | Catch code and supply-chain issues early                                                        |
+| Coverage badge           | Vitest emits a JSON summary, `coverage-badge.yml` publishes a shields endpoint to `gh-pages`                                                        | Live badge with no third-party service                                                          |
+| Releases                 | Tag `vX.Y.Z` triggers git-cliff changelog and notes, version bump committed back, CycloneDX SBOM, SLSA attestations, assets attached to the Release | Reproducible, auditable releases from commit history                                            |
+| Dependabot               | Weekly npm updates (dev deps grouped) and grouped github-actions updates                                                                            | Stay patched, grouping avoids partial bumps that break paired steps such as CodeQL              |
+| SHA-pinned actions       | Every action is pinned to a full commit SHA with a version comment                                                                                  | A moved tag cannot swap the code, Dependabot keeps the SHAs current                             |
+| Pinned bun               | Runtime version fixed in `.bun-version`                                                                                                             | Same runtime locally and in CI                                                                  |
 
 ## Project structure
 

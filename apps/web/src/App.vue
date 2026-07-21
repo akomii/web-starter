@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const title = "__PROJECT_NAME__";
+const title = "{{PROJECT_NAME}}";
 </script>
 
 <template>

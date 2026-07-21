@@ -1,11 +1,11 @@
 import { $ } from "bun";
 
 const TOKENS = [
-  "__PROJECT_NAME__",
-  "__REPO_SLUG__",
-  "__DESCRIPTION__",
-  "__AUTHOR__",
-  "__OWNER__"
+  "{{PROJECT_NAME}}",
+  "{{REPO_SLUG}}",
+  "{{DESCRIPTION}}",
+  "{{AUTHOR}}",
+  "{{OWNER}}"
 ] as const;
 type Token = (typeof TOKENS)[number];
 
@@ -37,11 +37,11 @@ const author = prompt("Author (Name <email>):", "") ?? "";
 const owner = prompt("Code owner (GitHub handle or team):", ownerGuess) ?? ownerGuess;
 
 const values: Record<Token, string> = {
-  __PROJECT_NAME__: name,
-  __REPO_SLUG__: slug,
-  __DESCRIPTION__: description,
-  __AUTHOR__: author,
-  __OWNER__: owner
+  "{{PROJECT_NAME}}": name,
+  "{{REPO_SLUG}}": slug,
+  "{{DESCRIPTION}}": description,
+  "{{AUTHOR}}": author,
+  "{{OWNER}}": owner
 };
 
 for (const file of FILES) {
