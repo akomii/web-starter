@@ -9,6 +9,9 @@ bun install
 ```
 
 This installs dependencies and sets up the git hooks (via lefthook).
+The shared git hooks are Python scripts and need `python3` on PATH. They are
+pulled from the repository configured under `remotes` in `lefthook.yml`, change
+`git_url` and `ref` there to use another source.
 
 ## Development
 
@@ -24,7 +27,8 @@ bun run build      # production build
 ## Commits
 
 Messages follow [Conventional Commits](https://www.conventionalcommits.org),
-enforced by commitlint through the `commit-msg` hook.
+enforced by the shared `commit-msg` hook from
+[aktin-github-scripts](https://github.com/aktin/aktin-github-scripts).
 
 ## Pull requests
 
