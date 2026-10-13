@@ -27,6 +27,8 @@ bun workspaces monorepo, Vue 3 + TypeScript (Vite), Vitest, ESLint (flat) + Pret
 
 ## Getting started
 
+Prerequisites: [bun](https://bun.sh) on PATH (the version is pinned in `.bun-version`). The shared git hooks are Python scripts and need `python3` on PATH.
+
 ```sh
 bun install        # deps + git hooks
 bun run dev        # start the web app (apps/web)
@@ -37,7 +39,15 @@ bun run format     # prettier
 bun run build      # production build
 ```
 
-Commits must follow [Conventional Commits](https://www.conventionalcommits.org) (enforced on commit). Cut a release by pushing a `vX.Y.Z` tag.
+The coverage report lands in `apps/web/coverage/index.html`.
+
+Commits must follow [Conventional Commits](https://www.conventionalcommits.org), enforced by the commit-msg hook:
+
+```
+<type>(<optional scope>): <subject>
+```
+
+Allowed types are `feat fix docs style refactor perf test chore`, the subject starts lowercase and has no trailing period, the header stays at most 100 characters. Cut a release by pushing a `vX.Y.Z` tag.
 
 ## Repository settings
 
@@ -60,17 +70,18 @@ Generating a repo from a template copies files and branches only, never settings
 
 ## How the infra works
 
-| Component                | What it does                                                                                                                                                                                                                             | Why                                                                                             |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| bun monorepo             | `apps/*` + `packages/*`, one lockfile, shared tooling at the root                                                                                                                                                                        | Add a backend (`apps/api`) or shared code (`packages/shared`) later without reworking the setup |
-| ESLint (flat) + Prettier | ESLint owns correctness, Prettier owns formatting                                                                                                                                                                                        | No rule conflicts, one formatter of record                                                      |
-| lefthook + shared hooks  | pre-commit formats and lints staged files and runs the shared hooks from aktin-github-scripts (data files, large files, commit size), commit-msg enforces Conventional Commits via the shared hook, pre-push runs typecheck, test, build | Catch problems locally, keep history parseable for the changelog                                |
-| CI                       | `ci.yml` calls the reusable `verify.yml` on push and PR, cancels superseded runs, least-privilege token                                                                                                                                  | Fast, safe feedback                                                                             |
-| Security scans           | CodeQL, dependency-review, OpenSSF Scorecard, secret scanning, all surfaced in the Security tab                                                                                                                                          | Catch code and supply-chain issues early                                                        |
-| Releases                 | Tag `vX.Y.Z` triggers git-cliff changelog and notes, version bump committed back, CycloneDX SBOM, SLSA attestations, assets attached to the Release                                                                                      | Reproducible, auditable releases from commit history                                            |
-| Dependabot               | Weekly npm updates (dev deps grouped) and grouped github-actions updates                                                                                                                                                                 | Stay patched, grouping avoids partial bumps that break paired steps such as CodeQL              |
-| SHA-pinned actions       | Every action is pinned to a full commit SHA with a version comment                                                                                                                                                                       | A moved tag cannot swap the code, Dependabot keeps the SHAs current                             |
-| Pinned bun               | Runtime version fixed in `.bun-version`                                                                                                                                                                                                  | Same runtime locally and in CI                                                                  |
+| Component                | What it does                                                                                                                                                                                                                                                      | Why                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| bun monorepo             | `apps/*` + `packages/*`, one lockfile, shared tooling at the root                                                                                                                                                                                                 | Add a backend (`apps/api`) or shared code (`packages/shared`) later without reworking the setup |
+| ESLint (flat) + Prettier | ESLint owns correctness, Prettier owns formatting                                                                                                                                                                                                                 | No rule conflicts, one formatter of record                                                      |
+| Vitest + coverage        | Unit tests with an 80% line gate (`thresholds`)                                                                                                                                                                                                                   | Regressions surface locally and in CI                                                           |
+| lefthook + shared hooks  | pre-commit formats and lints staged files, runs gitleaks when installed and the shared hooks from aktin-github-scripts (data files, large files, commit size), commit-msg enforces Conventional Commits via the shared hook, pre-push runs typecheck, test, build | Catch problems locally, keep history parseable for the changelog                                |
+| CI                       | `ci.yml` calls the reusable `verify.yml` on push and PR, cancels superseded runs, least-privilege token                                                                                                                                                           | Fast, safe feedback                                                                             |
+| Security scans           | CodeQL, dependency-review, OpenSSF Scorecard, secret scanning, all surfaced in the Security tab                                                                                                                                                                   | Catch code and supply-chain issues early                                                        |
+| Releases                 | Tag `vX.Y.Z` triggers git-cliff changelog and notes, version bump committed back, CycloneDX SBOM, SLSA attestations, assets attached to the Release                                                                                                               | Reproducible, auditable releases from commit history                                            |
+| Dependabot               | Weekly grouped npm and github-actions updates                                                                                                                                                                                                                     | Stay patched, grouping avoids partial bumps that break paired steps such as CodeQL              |
+| SHA-pinned actions       | Every action is pinned to a full commit SHA with a version comment                                                                                                                                                                                                | A moved tag cannot swap the code, Dependabot keeps the SHAs current                             |
+| Pinned bun               | Runtime version fixed in `.bun-version`                                                                                                                                                                                                                           | Same runtime locally and in CI                                                                  |
 
 ## Project structure
 
