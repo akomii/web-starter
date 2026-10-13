@@ -18,7 +18,7 @@ coverage/
 .env.*
 
 # IDE / editor
-.idea
-.vscode/*
+.idea/
+.vscode/
 .DS_Store
 *.sw?
