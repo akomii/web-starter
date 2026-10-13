@@ -38,5 +38,5 @@ pre-push hook runs those plus the build.
 ## Releases
 
 Push a `vX.Y.Z` tag. The release workflow builds the bundle, generates the
-changelog and notes, produces an SBOM and attestations, and publishes the
+release notes, produces an SBOM and attestations, and publishes the
 GitHub Release.
