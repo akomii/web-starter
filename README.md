@@ -89,6 +89,7 @@ Generating a repo from a template copies files and branches only, never settings
 apps/web/          Vue 3 + Vite app (the default workspace)
 packages/          shared packages (add as needed)
 .github/workflows/ CI, CodeQL, Scorecard, dependency-review, release
+SECURITY.md         how to report a vulnerability
 scripts/init.ts    one-time template initializer (removed after first run)
 ```
 

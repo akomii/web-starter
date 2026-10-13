@@ -1,22 +1,9 @@
 import { $ } from "bun";
 
-const TOKENS = [
-  "{{PROJECT_NAME}}",
-  "{{REPO_SLUG}}",
-  "{{DESCRIPTION}}",
-  "{{AUTHOR}}",
-  "{{OWNER}}"
-] as const;
+const TOKENS = ["{{PROJECT_NAME}}", "{{REPO_SLUG}}", "{{DESCRIPTION}}", "{{AUTHOR}}", "{{OWNER}}"] as const;
 type Token = (typeof TOKENS)[number];
 
-const FILES = [
-  "package.json",
-  "README.md",
-  "NOTICE",
-  ".github/CODEOWNERS",
-  "apps/web/index.html",
-  "apps/web/src/App.vue"
-];
+const FILES = ["package.json", "README.md", "NOTICE", "SECURITY.md", ".github/CODEOWNERS", "apps/web/index.html", "apps/web/src/App.vue"];
 
 async function defaultSlug(): Promise<string> {
   try {
@@ -56,10 +43,7 @@ for (const file of FILES) {
 
 const readme = Bun.file("README.md");
 if (await readme.exists()) {
-  const stripped = (await readme.text()).replace(
-    /<!-- template:start -->[\s\S]*?<!-- template:end -->\n?/g,
-    ""
-  );
+  const stripped = (await readme.text()).replace(/<!-- template:start -->[\s\S]*?<!-- template:end -->\n?/g, "");
   await Bun.write("README.md", stripped);
 }
 
@@ -79,6 +63,4 @@ try {
   // scripts/ not empty, leave it
 }
 
-console.log(
-  "\nInitialized. Review the diff, then commit. See the README 'Repository settings' section for the manual GitHub steps."
-);
+console.log("\nInitialized. Review the diff, then commit. See the README 'Repository settings' section for the manual GitHub steps.");
