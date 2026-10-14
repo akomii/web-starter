@@ -3,7 +3,7 @@ import { $ } from "bun";
 const TOKENS = ["{{PROJECT_NAME}}", "{{REPO_SLUG}}", "{{DESCRIPTION}}", "{{AUTHOR}}", "{{OWNER}}"] as const;
 type Token = (typeof TOKENS)[number];
 
-const FILES = ["package.json", "README.md", "NOTICE", "SECURITY.md", ".github/CODEOWNERS", "apps/web/index.html", "apps/web/src/App.vue"];
+const FILES = ["package.json", "README.md", "NOTICE", ".github/CODEOWNERS", "apps/web/index.html", "apps/web/src/App.vue"];
 
 async function defaultSlug(): Promise<string> {
   try {
